@@ -14,7 +14,7 @@ transform = transforms.Compose([
 class Lung(nn.Module):
     def __init__(self):
         super(Lung,self).__init__()
-        self.model = models.resnet18(pretrained=True)
+        self.model = models.resnet18(weights='ResNet18_Weights.DEFAULT')
         self.model.fc = nn.Linear(self.model.fc.in_features,4)
     def forward(self,x):
         return self.model(x)

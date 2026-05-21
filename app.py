@@ -1,91 +1,206 @@
-# app.py
-
 import streamlit as st
 import requests
 from PIL import Image
 
-# -----------------------------------
-# PAGE CONFIG
-# -----------------------------------
+BASE_URL = "http://127.0.0.1:8000"
+
 st.set_page_config(
     page_title="Lung Disease Detection",
     page_icon="🫁",
     layout="centered"
 )
 
-# -----------------------------------
-# TITLE
-# -----------------------------------
-st.title("🫁 Lung Disease Detection")
-st.write("Upload a Chest X-Ray Image")
+# -------------------------
+# SESSION STATE
+# -------------------------
 
-# -----------------------------------
-# FILE UPLOADER
-# -----------------------------------
-uploaded_file = st.file_uploader(
-    "Choose an image...",
-    type=["jpg", "jpeg", "png"]
+if "token" not in st.session_state:
+    st.session_state.token = None
+
+# -------------------------
+# SIDEBAR
+# -------------------------
+
+menu = st.sidebar.radio(
+    "Navigation",
+    ["Login", "Signup", "Predict"]
 )
 
-# -----------------------------------
-# PREDICT BUTTON
-# -----------------------------------
-if uploaded_file is not None:
+# -------------------------
+# SIGNUP
+# -------------------------
 
-    # Display Image
-    image = Image.open(uploaded_file)
+if menu == "Signup":
 
-    st.image(
-        image,
-        caption="Uploaded Image",
-        use_container_width=True
+    st.title("Create Account")
+
+    email = st.text_input("Email")
+
+    username = st.text_input("Username")
+
+    password = st.text_input(
+        "Password",
+        type="password"
     )
 
-    # Predict Button
-    if st.button("Predict"):
+    if st.button("Signup"):
 
-        with st.spinner("Predicting..."):
+        payload = {
+            "email": email,
+            "username": username,
+            "password": password
+        }
+
+        response = requests.post(
+            f"{BASE_URL}/signup",
+            json=payload
+        )
+
+        if response.status_code == 200:
+            st.success("Account created successfully")
+
+        else:
+            st.error(response.json())
+
+# -------------------------
+# LOGIN
+# -------------------------
+
+elif menu == "Login":
+
+    st.title("Login")
+
+    username = st.text_input("Username")
+
+    password = st.text_input(
+        "Password",
+        type="password"
+    )
+
+    if st.button("Login"):
+
+        payload = {
+            "username": username,
+            "password": password
+        }
+
+        response = requests.post(
+            f"{BASE_URL}/signin",
+            json=payload
+        )
+
+        if response.status_code == 200:
+
+            token = response.json()["access_token"]
+
+            st.session_state.token = token
+
+            st.success("Login successful")
+
+        else:
+            st.error(response.json())
+
+# -------------------------
+# PREDICTION
+# -------------------------
+
+elif menu == "Predict":
+
+    if st.session_state.token is None:
+
+        st.warning(
+            "Please login first"
+        )
+
+        st.stop()
+
+    st.title("🫁 Lung Disease Detection")
+
+    uploaded_file = st.file_uploader(
+        "Upload Chest X-Ray",
+        type=["jpg", "jpeg", "png"]
+    )
+
+    if uploaded_file is not None:
+
+        image = Image.open(uploaded_file)
+
+        st.image(
+            image,
+            caption="Uploaded Image",
+            use_container_width=True
+        )
+
+        if st.button("Predict"):
+
+            headers = {
+                "Authorization":
+                f"Bearer {st.session_state.token}"
+            }
+
+            files = {
+                "file": (
+                    uploaded_file.name,
+                    uploaded_file.getvalue(),
+                    uploaded_file.type
+                )
+            }
 
             try:
 
-                # FastAPI endpoint
-                url = "http://127.0.0.1:8000/predict"
-
-                # Send image to FastAPI
-                files = {
-                    "file": (
-                        uploaded_file.name,
-                        uploaded_file.getvalue(),
-                        uploaded_file.type
-                    )
-                }
-
                 response = requests.post(
-                    url,
-                    files=files
+                    f"{BASE_URL}/predict",
+                    files=files,
+                    headers=headers
                 )
 
-                # Convert response
-                data = response.json()
+                if response.status_code == 200:
 
-                # Show Result
-                st.success("Prediction Complete")
+                    data = response.json()
 
-                st.subheader("Result")
+                    st.success(
+                        "Prediction Complete"
+                    )
 
-                st.write(
-                    f"### Disease: {data['message']['label']}"
-                )
-
-                # Confidence (if available)
-                if "confidence" in data["message"]:
-
-                    confidence = data["message"]["confidence"]
+                    st.subheader("Result")
 
                     st.write(
-                        f"### Confidence: {confidence:.4f}"
+                        f"### Disease: "
+                        f"{data['message']['label']}"
+                    )
+
+                    if (
+                        "confidence"
+                        in data["message"]
+                    ):
+
+                        st.write(
+                            f"### Confidence: "
+                            f"{data['message']['confidence']:.4f}"
+                        )
+
+                else:
+
+                    st.error(
+                        response.json()
                     )
 
             except Exception as e:
 
-                st.error(f"Error: {e}")
+                st.error(str(e))
+
+# -------------------------
+# LOGOUT
+# -------------------------
+
+if st.session_state.token:
+
+    st.sidebar.success(
+        "Logged In"
+    )
+
+    if st.sidebar.button("Logout"):
+
+        st.session_state.token = None
+
+        st.rerun()

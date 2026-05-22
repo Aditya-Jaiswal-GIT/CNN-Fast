@@ -8,3 +8,4 @@ pyjwt
 torch
 torchvision
 pydantic[email]
+python-multipart

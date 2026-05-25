@@ -1,8 +1,11 @@
 import streamlit as st
 import requests
+import os
+from dotenv import load_dotenv
 from PIL import Image
+load_dotenv()
 
-BASE_URL = "https://lung-backend-5e0fe491.fastapicloud.dev/"
+BASE_URL = st.secrets["BACKEND"]
 
 st.set_page_config(
     page_title="Lung Disease Detection",

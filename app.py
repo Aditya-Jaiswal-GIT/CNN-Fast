@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from PIL import Image
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "https://lung-backend-5e0fe491.fastapicloud.dev/"
 
 st.set_page_config(
     page_title="Lung Disease Detection",
@@ -52,7 +52,7 @@ if menu == "Signup":
         }
 
         response = requests.post(
-            f"{BASE_URL}/signup",
+            f"{BASE_URL}signup",
             json=payload
         )
 
@@ -85,7 +85,7 @@ elif menu == "Login":
         }
 
         response = requests.post(
-            f"{BASE_URL}/signin",
+            f"{BASE_URL}signin",
             json=payload
         )
 
@@ -149,7 +149,7 @@ elif menu == "Predict":
             try:
 
                 response = requests.post(
-                    f"{BASE_URL}/predict",
+                    f"{BASE_URL}predict",
                     files=files,
                     headers=headers
                 )

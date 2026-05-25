@@ -1,9 +1,7 @@
 import streamlit as st
 import requests
 import os
-from dotenv import load_dotenv
 from PIL import Image
-load_dotenv()
 
 BASE_URL = st.secrets["BACKEND"]
 

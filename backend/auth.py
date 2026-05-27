@@ -6,10 +6,12 @@ import os
 import json
 from dotenv import load_dotenv
 load_dotenv()
+#Intilize hashing libary object
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
 )
+# Load and Store the user data function
 def load():
     with open(rf"data.json",'r') as f :
         data = json.load(f)
@@ -17,17 +19,22 @@ def load():
 def store(data:dict):
     with open(rf"data.json",'w') as f :
         store = json.dump(data,f,indent=4)
+
+#JWT Requirment
 jwt_secret = os.getenv("JWT_TOKEN")
 jwt_algo = "HS256"
 oauth = OAuth2PasswordBearer(tokenUrl="signin")
 
+#Used to verify the user password
 def verify(plainpassword:str,hashpassword:str):
     return pwd_context.verify(plainpassword,hashpassword)
 
+#USed to generate the hash of the user password
 def hash(password:str):
     hashed_pwd = pwd_context.hash(password)
     return hashed_pwd
 
+#Use to create the user and store in the DB
 def create(data:dict):
     jsons = load()
     for json in jsons:
@@ -42,7 +49,7 @@ def create(data:dict):
     print(len(data["password"]))
     jsons.append(user)
     store(jsons)
-
+#Used to authenticate user
 def authenticate(data:dict):
     jsons = load()
     flag=0
@@ -58,7 +65,7 @@ def authenticate(data:dict):
     else :
         return user
 
-
+#Create The JWT Token
 def encode(data:dict):
     payload = data.copy()
     token = jwt.encode(payload,jwt_secret, algorithm=jwt_algo)

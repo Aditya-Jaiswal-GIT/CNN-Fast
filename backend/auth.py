@@ -17,7 +17,7 @@ def load():
 def store(data:dict):
     with open(rf"data.json",'w') as f :
         store = json.dump(data,f,indent=4)
-jwt_secret = os.getenv('JWT_TOKEN')
+jwt_secret = os.getenv("JWT_TOKEN")
 jwt_algo = "HS256"
 oauth = OAuth2PasswordBearer(tokenUrl="signin")
 
@@ -71,6 +71,8 @@ def decode(token):
         return {'error' : "Token Expired"}
     except jwt.InvalidTokenError:
         return {'error' : "Invalid Token"}
+    
+
 async def get_current_user(
     token: str = Depends(oauth)
 ):

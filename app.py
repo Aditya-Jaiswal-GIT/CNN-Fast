@@ -6,7 +6,7 @@ from PIL import Image
 BASE_URL = st.secrets["BACKEND"]
 
 st.set_page_config(
-    page_title="Lung Disease Detection",
+    page_title="LungSense",
     page_icon="🫁",
     layout="centered"
 )

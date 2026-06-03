@@ -115,7 +115,7 @@ elif menu == "Predict":
 
         st.stop()
 
-    st.title("🫁 Lung Disease Detection")
+    st.title("🫁 LungSense")
 
     uploaded_file = st.file_uploader(
         "Upload Chest X-Ray",

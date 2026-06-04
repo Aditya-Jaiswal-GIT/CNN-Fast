@@ -34,9 +34,9 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 
 @app.post("/signup")
 @limiter.limit("5/minute")
-def signup(data:Signup,request:Request):
+async def signup(data:Signup,request:Request):
     create(data.model_dump())
-    asyncio.run(send_mail(data.dict().get('email')))
+    await send_mail(data.dict().get('email'))
     return JSONResponse(status_code=200,content="User created Sucessfully")
 
 @app.post("/signin")

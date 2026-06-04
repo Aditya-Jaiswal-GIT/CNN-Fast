@@ -9,6 +9,8 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from email_send import send_mail
+import asyncio
 app = FastAPI()
 limiter = Limiter(key_func=get_remote_address)
 
@@ -34,6 +36,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 @limiter.limit("5/minute")
 def signup(data:Signup,request:Request):
     create(data.model_dump())
+    asyncio.run(send_mail(data.dict().get('email')))
     return JSONResponse(status_code=200,content="User created Sucessfully")
 
 @app.post("/signin")

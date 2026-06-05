@@ -54,7 +54,7 @@ if menu == "Signup":
         }
 
         response = requests.post(
-            f"{BASE_URL}signup",
+            f"{SIGNUP}signup",
             json=payload
         )
 

@@ -29,5 +29,3 @@ async def send_mail(mail):
     await fm.send_message(message)
     print("Mail sent!")
     return JSONResponse(status_code=200, content={"message": "email has been sent"})
-
-

@@ -10,3 +10,4 @@ torchvision
 pydantic[email]
 python-multipart
 fastapi-mail
+pymongo[srv]

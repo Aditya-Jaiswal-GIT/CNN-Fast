@@ -3,7 +3,8 @@ import requests
 import os
 from PIL import Image
 
-BASE_URL = st.secrets["BACKEND"]
+BASE_URL = st.secrets['BACKEND']
+SIGNUP = st.secrets['SIGNUP']
 
 st.set_page_config(
     page_title="LungSense",

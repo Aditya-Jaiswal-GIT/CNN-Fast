@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile,Request,Depends
+from fastapi import FastAPI, HTTPException, File, UploadFile,Request,Depends,BackgroundTasks
 from fastapi.responses import JSONResponse
 from model import prediction
 from db.auth import register_user,authenticate,encode,decode,get_current_user
@@ -34,9 +34,12 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 
 @app.post("/signup")
 @limiter.limit("5/minute")
-async def signup(data:Signup,request:Request):
-    register_user(data.model_dump())
-    await send_mail(data.dict().get('email'))
+async def signup(data:Signup,request:Request,background:BackgroundTasks):
+    user_id = register_user(data.model_dump())
+    background.add_task(
+        send_mail,
+        data.email
+    )
     return JSONResponse(status_code=200,content="User created Sucessfully")
 
 @app.post("/signin")
